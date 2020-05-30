@@ -14,4 +14,4 @@ for song in songs:
         rank = song.select_one('td.number').text
         title = a_tag.text.strip()
         singer = song.select_one('td.info > a.artist.ellipsis').text
-        print(rank[:-6].rstrip(),title.strip(),singer.strip())
+        print(rank[0:2].strip(),title.strip(),singer.strip())

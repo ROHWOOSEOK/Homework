@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원페이지 쇼핑몰</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        * {
+            font-family: 'Black And White Picture', sans-serif;
+        }
+
+        .wrap {
+            width: 660px;
+            margin: 10px auto;
+        }
+
+        .img {
+            background-image: url('https://dvdprime.com/g2/data/cheditor5/1909/view_thumbnail/mania-done-20190914210007_saqscnxd.jpg');
+            background-size: cover;
+            background-position: center;
+            width: 660px;
+            height: 406px;
+        }
+
+        .buttons {
+            width: 100px;
+            margin: 10px auto;
+        }
+
+        .info-temp {
+            color: blue;
+            margin: 20px auto
+        }
+
+        .orders {
+            margin-top: 100px;
+        }
+    </style>
+
+    <script>
+        function order() {
+            let name = $('#name').val();
+            let amount = $('#amount').val();
+            let address = $('#address').val();
+            let phone = $('#phone').val();
+
+            if (name == '') {
+                alert('이름을 입력해주세요')
+                $('#name').focus();
+                return;
+            } else if (amount == '수량을 선택하세요') {
+                alert('수량을 입력해주세요')
+                $('#amount').focus();
+                return;
+            } else if (address == '') {
+                alert('주소를 입력해주세요')
+                $('#address').focus();
+                return;
+            } else if (phone == '') {
+                alert('전화번호를 입력해주세요')
+                $('#phone').focus();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/orders",
+                data: { name_give: name, amount_give: amount, address_give: address, phone_give: phone },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert(response['msg']);
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+
+        function listing() {
+            $.ajax({
+                type: "GET",
+                url: "orders",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let reviews = response['orders'];
+                        for (let i = 0; i < reviews.length; i++) {
+                            make_card(reviews[i]['name'], reviews[i]['amount'], reviews[i]['address'], reviews[i]['phone']);
+                        }
+                    } else {
+                        alert('주문정보를 받아오지 못했습니다');
+                    }
+                }
+            })
+        }
+
+        function make_card(name, amount, address, phone) {
+            let temp_html = `<tr>
+                                <td>${name}</td>
+                                <td>${amount}</td>
+                                <td>${address}</td>
+                                <td>${phone}</td>
+                            </tr>`;
+            $('#orders-box').append(temp_html);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <div class="img"></div>
+        <div style="margin-bottom: 20px;">
+            <h1>20세기소년 전권(1~22) <span style="font-size: 12pt;">가격: 1,000,000원</span></h1>
+            <p>무사히 21세기를 맞이한 인류에게 전하는 본격 과학 모험만화,《20세기 소년》이 완전판으로 돌아온다. 일반판 거의 2권 분량을 한 권으로 엮어 두꺼운 볼륨으로 찾아오는 이번 완전판은 잡지
+                연재
+                당시의
+                컬러까지 완전히 재현하여 팬들의 소장가치를 높일 것이다.</p>
+            <p>1997년, 록 스타가 되겠다는 꿈을 꾸며 실종된 누나의 딸 칸나를 업고 편의점 점장으로 일하는 켄지 주위에서 갑자기 이변이 일어나기 시작한다. 동창생의 죽음. 그 뒤에 엿보이는 신흥종교
+                교단의
+                정체.
+                연달아 일어나는 알 수 없는 사건들의 진상을 따라가면서 악당을 쓰러뜨리고 지구의 평화를 지키는것을 꿈꾸던 소년시절의 기억이 되살아난다.</p>
+        </div>
+
+        <div class="info-temp">
+            달러-원 환율:
+            <span id="exchange_rate"> </span>
+        </div>
+
+        <div>
+            <h4><span style="color: navy;">주문 정보</span></h4>
+            <div class="input-group flex-nowrap" style="margin-bottom: 15px;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">주문자 이름</span>
+                </div>
+                <input id="name" type="text" class="form-control" aria-label="Username"
+                    aria-describedby="addon-wrapping">
+            </div>
+            <div class="input-group mb-3" style="margin-bottom: 15px;">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">수량</label>
+                </div>
+                <select id="amount" class="custom-select">
+                    <option selected>수량을 선택하세요</option>
+                    <option value="1">1set</option>
+                    <option value="2">2set</option>
+                    <option value="3">3set</option>
+                </select>
+            </div>
+            <div class="input-group flex-nowrap" style="margin-bottom: 15px;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">주소</span>
+                </div>
+                <input id="address" type="text" class="form-control" aria-label="Username"
+                    aria-describedby="addon-wrapping">
+            </div>
+            <div class="input-group flex-nowrap" style="margin-bottom: 15px;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">전화번호</span>
+                </div>
+                <input id="phone" type="text" class="form-control" aria-label="Username"
+                    aria-describedby="addon-wrapping">
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="order()" type="button" class="btn btn-primary">주문하기</button>
+        </div>
+        <div class="orders">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">이름</th>
+                        <th scope="col">수량</th>
+                        <th scope="col">주소</th>
+                        <th scope="col">전화번호</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-box">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
